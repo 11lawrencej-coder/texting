@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Global Chat</title>
+</head>
+<body>
+
+<h1>Global Chat</h1>
+
+<div id="chat"></div>
+
+<br>
+
+<input id="name" placeholder="Name">
+<input id="msg" placeholder="Message">
+<button onclick="send()">Send</button>
+
+<script>
+
+async function loadChat()
+{
+    let res = await fetch("/messages");
+    let msgs = await res.json();
+
+    let html = "";
+
+    for(let msg of msgs)
+    {
+        html += `<p><b>${msg.name}</b>: ${msg.message}</p>`;
+    }
+
+    document.getElementById("chat").innerHTML = html;
+}
+
+async function send()
+{
+    await fetch("/send", {
+        method: "POST",
+        headers: {
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+            name: document.getElementById("name").value,
+            message: document.getElementById("msg").value
+        })
+    });
+
+    document.getElementById("msg").value = "";
+
+    loadChat();
+}
+
+setInterval(loadChat, 1000);
+
+loadChat();
+
+</script>
+
+</body>
+</html>
